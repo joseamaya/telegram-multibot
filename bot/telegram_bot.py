@@ -33,8 +33,7 @@ class TelegramBot:
 
     async def handle_text_message(self, update: Update, context: CallbackContext):
         message_tg = update.message
-        user_tg = update.effective_user
         chat_tg = update.effective_chat
         message_text = message_tg.text
         response = await self.graph.reply(chat_id=chat_tg.id, text=message_text)
-        await message_tg.reply_text(response["answer"])
+        await message_tg.reply_text(response)

@@ -19,8 +19,8 @@ def create_supabase_vector_store():
         vector_store = SupabaseVectorStore(
             client=supabase,
             embedding=embeddings,
-            table_name="documents",  # nombre de la tabla en Supabase
-            query_name="match_documents"  # nombre de la función de búsqueda
+            table_name="documents",
+            query_name="match_documents"
         )
     except Exception as e:
         logger.error(f"Error creando vector store: {str(e)}")

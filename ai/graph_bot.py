@@ -18,5 +18,7 @@ class GraphBot:
         async with AsyncPostgresSaver.from_conn_string(DB_URI) as short_term_memory:
             await short_term_memory.setup()
             graph = self.graph_builder.compile(checkpointer=short_term_memory, store=self.store)
-            response = await graph.ainvoke({"messages": [HumanMessage(content=text)]}, config)
-        return response
+            await graph.ainvoke({"messages": [HumanMessage(content=text)]}, config)
+            output_state = await graph.aget_state(config=config)
+        response_message = output_state.values["messages"][-1].content
+        return response_message

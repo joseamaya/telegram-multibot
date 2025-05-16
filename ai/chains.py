@@ -22,11 +22,9 @@ def get_memory_chain():
     return prompt | model
 
 
-def get_character_chain(summary: str = ""):
+def get_character_chain():
     model = ChatOpenAI(model="gpt-4o", temperature=0.5)
     system_message = CHARACTER_PROMPT
-    if summary:
-        system_message += f"\n\nSummary of conversation earlier between Lucía and the user: {summary}"
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", system_message),
