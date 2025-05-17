@@ -10,15 +10,11 @@ async def memory_extraction_node(state: StateBot, config: RunnableConfig):
     response = await chain.ainvoke({"message": state["messages"][-1]})
     if response.is_important:
         chat_id = config["configurable"]["chat_id"]
-        try:
-            retriever = get_retriever()
-            if retriever and hasattr(retriever, "vectorstore"):
-                retriever.vectorstore.add_texts(
-                    texts=[response.formatted_memory],
-                    metadatas=[{"chat_id": int(chat_id)}]
-                )
-        except Exception as e:
-            print(e)
+        retriever = get_retriever()
+        retriever.vectorstore.add_texts(
+            texts=[response.formatted_memory],
+            metadatas=[{"chat_id": int(chat_id)}]
+        )
     return {}
 
 async def memory_injection_node(state: StateBot, config: RunnableConfig):
@@ -42,4 +38,4 @@ async def generate_response(state: StateBot, config: RunnableConfig):
         },
         config,
     )
-    return {"answer": response.content, "messages": response}
+    return {"messages": response}

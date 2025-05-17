@@ -1,0 +1,12 @@
+fastapi==0.115.12
+langchain==0.3.25
+langchain-community==0.3.24
+langchain-core==0.3.59
+langchain-openai==0.3.16
+langgraph==0.4.3
+langgraph-checkpoint-postgres==2.0.21
+psycopg==3.2.9
+psycopg-pool==3.2.6
+pyngrok==7.2.3
+python-telegram-bot==22.0
+supabase==2.15.1
