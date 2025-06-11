@@ -7,10 +7,10 @@ from ai.graph_bot import GraphBot
 
 class TelegramBot:
 
-    def __init__(self, token: str, store):
+    def __init__(self, token: str):
         self.token = token
         self.app = Application.builder().token(token).build()
-        self.graph = GraphBot(store=store)
+        self.graph = GraphBot()
         self._setup_handlers()
 
     def _setup_handlers(self):

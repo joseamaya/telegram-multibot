@@ -8,11 +8,10 @@ class BotManager:
 
     def __init__(self):
         self.bots: Dict[str, TelegramBot] = {}
-        self._store = get_store()
 
     def add_bot(self, token: str) -> TelegramBot:
         if token not in self.bots:
-            self.bots[token] = TelegramBot(token, self._store)
+            self.bots[token] = TelegramBot(token)
         return self.bots[token]
 
     def get_bot(self, token: str) -> TelegramBot:

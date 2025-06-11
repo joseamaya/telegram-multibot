@@ -8,8 +8,7 @@ from ai.graph import create_workflow_graph
 
 class GraphBot:
 
-    def __init__(self, store):
-        self.store = store
+    def __init__(self):
         self.graph_builder = create_workflow_graph()
 
     async def reply(self, chat_id, text=None):
@@ -17,7 +16,7 @@ class GraphBot:
         DB_URI = os.environ.get('DB_URI')
         async with AsyncPostgresSaver.from_conn_string(DB_URI) as short_term_memory:
             await short_term_memory.setup()
-            graph = self.graph_builder.compile(checkpointer=short_term_memory, store=self.store)
+            graph = self.graph_builder.compile(checkpointer=short_term_memory)
             await graph.ainvoke({"messages": [HumanMessage(content=text)]}, config)
             output_state = await graph.aget_state(config=config)
         response_message = output_state.values["messages"][-1].content
