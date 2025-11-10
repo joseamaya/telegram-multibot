@@ -1,9 +1,10 @@
-import os
-
 from langchain_core.messages import HumanMessage
-from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from langgraph.checkpoint.mongodb import AsyncMongoDBSaver
 
 from ai.graph import create_workflow_graph
+from config.settings import get_settings
+
+settings = get_settings()
 
 
 class GraphBot:
@@ -13,10 +14,11 @@ class GraphBot:
 
     async def reply(self, chat_id, text=None):
         config = {"configurable": {"thread_id": str(chat_id), "chat_id": str(chat_id)}}
-        DB_URI = os.environ.get('DB_URI')
-        async with AsyncPostgresSaver.from_conn_string(DB_URI) as short_term_memory:
-            await short_term_memory.setup()
-            graph = self.graph_builder.compile(checkpointer=short_term_memory)
+        async with AsyncMongoDBSaver.from_conn_string(
+            settings.MONGO_DB_URL,
+            db_name=settings.MONGO_DB_NAME
+        ) as checkpointer:
+            graph = self.graph_builder.compile(checkpointer=checkpointer)
             await graph.ainvoke({"messages": [HumanMessage(content=text)]}, config)
             output_state = await graph.aget_state(config=config)
         response_message = output_state.values["messages"][-1].content
