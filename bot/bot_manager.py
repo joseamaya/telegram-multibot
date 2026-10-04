@@ -1,6 +1,5 @@
 from typing import Dict
 
-from ai.store import get_store
 from bot.telegram_bot import TelegramBot
 
 
@@ -9,9 +8,9 @@ class BotManager:
     def __init__(self):
         self.bots: Dict[str, TelegramBot] = {}
 
-    def add_bot(self, token: str) -> TelegramBot:
+    def add_bot(self, token: str, store, checkpointer) -> TelegramBot:
         if token not in self.bots:
-            self.bots[token] = TelegramBot(token)
+            self.bots[token] = TelegramBot(token, store=store, checkpointer=checkpointer)
         return self.bots[token]
 
     def get_bot(self, token: str) -> TelegramBot:

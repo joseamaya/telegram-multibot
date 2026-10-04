@@ -1,25 +1,23 @@
 from langchain_core.messages import HumanMessage
-from langgraph.checkpoint.mongodb import AsyncMongoDBSaver
 
 from ai.graph import create_workflow_graph
-from config.settings import get_settings
-
-settings = get_settings()
+from ai.state import Context
 
 
 class GraphBot:
 
-    def __init__(self):
-        self.graph_builder = create_workflow_graph()
+    def __init__(self, store, checkpointer):
+        self.graph = create_workflow_graph().compile(
+            checkpointer=checkpointer,
+            store=store,
+        )
 
-    async def reply(self, chat_id, text=None):
-        config = {"configurable": {"thread_id": str(chat_id), "chat_id": str(chat_id)}}
-        async with AsyncMongoDBSaver.from_conn_string(
-            settings.MONGO_DB_URL,
-            db_name=settings.MONGO_DB_NAME
-        ) as checkpointer:
-            graph = self.graph_builder.compile(checkpointer=checkpointer)
-            await graph.ainvoke({"messages": [HumanMessage(content=text)]}, config)
-            output_state = await graph.aget_state(config=config)
-        response_message = output_state.values["messages"][-1].content
-        return response_message
+    async def reply(self, chat_id, user_id, text=None):
+        config = {"configurable": {"thread_id": str(chat_id)}}
+        await self.graph.ainvoke(
+            {"messages": [HumanMessage(content=text)]},
+            config,
+            context=Context(user_id=str(user_id)),
+        )
+        output_state = await self.graph.aget_state(config=config)
+        return output_state.values["messages"][-1].content

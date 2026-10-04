@@ -1,4 +1,4 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, Bot
+from telegram import Update
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, ContextTypes, MessageHandler, filters, \
     CallbackContext
 
@@ -7,10 +7,10 @@ from ai.graph_bot import GraphBot
 
 class TelegramBot:
 
-    def __init__(self, token: str):
+    def __init__(self, token: str, store, checkpointer):
         self.token = token
         self.app = Application.builder().token(token).build()
-        self.graph = GraphBot()
+        self.graph = GraphBot(store=store, checkpointer=checkpointer)
         self._setup_handlers()
 
     def _setup_handlers(self):
@@ -34,6 +34,10 @@ class TelegramBot:
     async def handle_text_message(self, update: Update, context: CallbackContext):
         message_tg = update.message
         chat_tg = update.effective_chat
-        message_text = message_tg.text
-        response = await self.graph.reply(chat_id=chat_tg.id, text=message_text)
+        user_tg = update.effective_user
+        response = await self.graph.reply(
+            chat_id=chat_tg.id,
+            user_id=user_tg.id,
+            text=message_tg.text,
+        )
         await message_tg.reply_text(response)
