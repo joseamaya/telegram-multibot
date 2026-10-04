@@ -1,9 +1,13 @@
-from typing import Dict
-from langgraph.store.memory import InMemoryStore
+from langgraph.store.mongodb import create_vector_index_config
 
-_store: Dict[str, InMemoryStore] = {}
+from ai.embeddings import get_embeddings
 
-def get_store() -> InMemoryStore:
-    if "store" not in _store:
-        _store["store"] = InMemoryStore()
-    return _store["store"]
+EMBEDDING_DIMENSION = 1536
+
+
+def get_index_config():
+    """Configuración del índice vectorial para la búsqueda semántica del store."""
+    return create_vector_index_config(
+        embed=get_embeddings(),
+        dims=EMBEDDING_DIMENSION,
+    )
